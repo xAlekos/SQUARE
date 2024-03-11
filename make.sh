@@ -1,0 +1,1 @@
+gcc -Wall -o square `pkg-config raylib --cflags --libs` render.c
