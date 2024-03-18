@@ -1,9 +1,6 @@
 #include <stdio.h>
-#include "tilemap.h"
 #include "player.h"
 
-#define TILE_WIDTH 64
-#define TILE_HEIGHT 64
 
 void render_tilemap(tilemap_t* map){
     int j = 0;
@@ -11,7 +8,7 @@ void render_tilemap(tilemap_t* map){
         if(i != 0 && i % map->x_dim == 0)
             j++;
         Color tile_color = TileColor(map->tiles[i]);
-        DrawRectangle((i % map->x_dim)*TILE_WIDTH,j*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT,tile_color);
+        DrawRectangle((i % map->x_dim)*map->tile_width,j*map->tile_height,map->tile_width,map->tile_height,tile_color);
 
     }
 
@@ -23,12 +20,23 @@ void render_player(player_t* player){
 
 }
 
+void highlight_tile(player_t* player, tilemap_t* map){
+    Vector2 tile_pos;
+    Vector2 player_center;
+    player_center.x = player->pos.x + map->tile_width  / 2;
+    player_center.y = player->pos.y + map->tile_height / 2;
+    tile_pos = get_tile(player_center,map);
+    DrawRectangleLines(tile_pos.x * map->tile_width, tile_pos.y * map->tile_height, map->tile_width, map->tile_height, MAROON);
+
+}
+
 void DrawScreen(tilemap_t* map , player_t* player, float delta){
         
         ClearBackground(WHITE);
         BeginDrawing();
         render_tilemap(map);
         render_player(player);
+        highlight_tile(player,map);
         EndDrawing();
 
 }
@@ -53,7 +61,7 @@ int main(int argc, char** argv){
     float delta;
     uint8_t should_update = 0;
 
-    InitWindow(TILE_WIDTH*map->x_dim,TILE_HEIGHT*map->y_dim,"SQUARE");
+    InitWindow(map->tile_width*map->x_dim,map->tile_height*map->y_dim,"SQUARE");
     SetTargetFPS(60);
 
     while(!WindowShouldClose()){
