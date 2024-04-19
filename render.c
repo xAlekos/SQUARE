@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+
 #include "player.h"
 
 
@@ -22,30 +24,75 @@ void render_player(player_t* player){
 
 void highlight_tile(player_t* player, tilemap_t* map){
     Vector2 tile_pos;
-    Vector2 player_center;
-    player_center.x = player->pos.x + map->tile_width  / 2;
-    player_center.y = player->pos.y + map->tile_height / 2;
-    tile_pos = get_tile(player_center,map);
+    Vector2 player_center = player_center_get(player);
+
+    tile_pos = tile_cords_from_pos(player_center,map);
     DrawRectangleLines(tile_pos.x * map->tile_width, tile_pos.y * map->tile_height, map->tile_width, map->tile_height, MAROON);
 
 }
 
-void DrawScreen(tilemap_t* map , player_t* player, float delta){
+
+void draw_ui(player_t* player, tilemap_t* map){
+
+    Vector2 player_center = player_center_get(player);
+    Vector2 tile_pos = tile_cords_from_pos(player_center,map);
+    char tile_type[10];
+    int tile_cord = tile_pos.y * map->x_dim + tile_pos.x;
+
+    switch (map->tiles[tile_cord].type){
+    case WILL:
+        strcpy(tile_type,"WILL");
+        break;
+    case ACID:
+        strcpy(tile_type,"ACID");
+        break;
+    case GROUND:
+        strcpy(tile_type,"GROUND");
+    default:
+        break;
+    }
+    DrawText(TextFormat("TILE TYPE: %s", tile_type),5,5,25,WHITE);
+
+}
+
+void DrawScreen(world_node_t* map , player_t* player, float delta){
         
         ClearBackground(WHITE);
         BeginDrawing();
-        render_tilemap(map);
+        render_tilemap(map->actual);
         render_player(player);
-        highlight_tile(player,map);
+        highlight_tile(player,map->actual);
+        draw_ui(player,map->actual);
         EndDrawing();
 
 }
 
-void update(tilemap_t* map, player_t* player,float delta,uint8_t* update_flag){
+void update(world_node_t** map, player_t* player,float delta,uint8_t* update_flag){
     
     if(*update_flag == 1){
         update_player_pos(player,delta);
-        DrawScreen(map,player,delta);
+        
+        if(player->pos.x < 0){
+            update_tilemap(WEST,map);
+            player->pos.x = TILE_WIDTH * (*map)->actual->x_dim;
+        }
+
+        if(player->pos.x > TILE_WIDTH * (*map)->actual->x_dim){
+            update_tilemap(EAST,map);
+            player->pos.x = 0;
+        }
+
+        if(player->pos.y < 0){
+            update_tilemap(NORTH,map);
+            player->pos.y = TILE_HEIGHT * (*map)->actual->y_dim;
+        }
+
+         if(player->pos.y > TILE_HEIGHT * (*map)->actual->y_dim){
+            update_tilemap(SOUTH,map);
+            player->pos.y = 0;
+        }
+
+        DrawScreen(*map,player,delta);
         *update_flag = 0;
     }
 
@@ -56,12 +103,12 @@ void update(tilemap_t* map, player_t* player,float delta,uint8_t* update_flag){
 
 int main(int argc, char** argv){
 
-    tilemap_t* map = init_map(12,16);
+    world_node_t* map = init_world_node();
     player_t* player = init_player(24/2, 32/2,32,32,400);
     float delta;
     uint8_t should_update = 0;
 
-    InitWindow(map->tile_width*map->x_dim,map->tile_height*map->y_dim,"SQUARE");
+    InitWindow(map->actual->x_dim * TILE_WIDTH, map->actual->y_dim * TILE_HEIGHT,"SQUARE");
     SetTargetFPS(60);
 
     while(!WindowShouldClose()){
@@ -71,6 +118,6 @@ int main(int argc, char** argv){
         DrawScreen(map,player,delta);
         PlayerInput(player,map,delta,&should_update);
         if(should_update == 1)
-            update(map,player,delta,&should_update);
+            update(&map,player,delta,&should_update);
     }
 }

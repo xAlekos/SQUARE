@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <raylib.h>
 #include "tilemap.h"
 
 typedef enum player_states{
@@ -46,7 +47,7 @@ void update_player_pos(player_t* player, float delta){
 }
 
 
-void PlayerInput(player_t* player,tilemap_t* map ,float delta,uint8_t* update_flag){
+void PlayerInput(player_t* player,world_node_t* map ,float delta,uint8_t* update_flag){
 
     if(IsKeyDown(KEY_A)){
         player->vec_speed.x -= 1;
@@ -70,3 +71,11 @@ void PlayerInput(player_t* player,tilemap_t* map ,float delta,uint8_t* update_fl
 
 }
 
+Vector2 player_center_get(player_t* player){
+
+    Vector2 player_center;
+    player_center.x = player->pos.x + player->size.x  / 2;
+    player_center.y = player->pos.y + player->size.y / 2;
+    return player_center;
+
+}
