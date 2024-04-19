@@ -101,15 +101,173 @@ world_node_t* init_world_node(){
 
 }
 
-void update_tilemap(update_direction_t direction, world_node_t** world){
+
+void connect_tilemap(update_direction_t direction, world_node_t* starting_node, world_node_t* connect_to){
+    
+    world_node_t* position = starting_node;
 
     switch(direction){
         case NORTH:
-            if((*world)->north == NULL){
-                (*world)->north = init_world_node();
+            if(position->east != NULL){
+                position = position->east;
+                if(position->north != NULL){
+                    position = position->north;
+                    position->west = connect_to;
+                    connect_to->east = position;
+                    if(position->north != NULL){
+                        position = position->north;
+                        if(position->west != NULL){
+                            position = position->west;
+                            position->south = connect_to;
+                            connect_to->north = position;
+                        }
+                    }
+                }
             }
-            (*world)->north->south = *world;
-            *world = (*world)->north;
+            position = starting_node;
+            if(position->west != NULL){
+                position = position->west;
+                if(position->north != NULL){
+                    position = position->north;
+                    position->east = connect_to;
+                    connect_to->west = position;
+                    if(position->north != NULL){
+                        position = position->north;
+                        if(position->east != NULL){
+                            position = position->east;
+                            position->south = connect_to;
+                            connect_to->north = position;
+                        }
+                    }
+                }
+            }
+            break;
+
+        case SOUTH:
+            if(position->east != NULL){
+                position = position->east;
+                if(position->south != NULL){
+                    position = position->south;
+                    position->west = connect_to;
+                    connect_to->east = position;
+                    if(position->south != NULL){
+                        position = position->south;
+                        if(position->west != NULL){
+                            position = position->west;
+                            position->north = connect_to;
+                            connect_to->south = position;
+                        }
+                    }
+                }
+            }
+            position = starting_node;
+            if(position->west != NULL){
+                position = position->west;
+                if(position->south != NULL){
+                    position = position->south;
+                    position->east = connect_to;
+                    connect_to->west = position;
+                    if(position->south != NULL){
+                        position = position->south;
+                        if(position->east != NULL){
+                            position = position->east;
+                            position->north = connect_to;
+                            connect_to->south = position;
+                        }
+                    }
+                }
+            }
+            break;
+
+        case EAST:
+            if(position->north != NULL){
+                position = position->north;
+                if(position->east != NULL){
+                    position = position->east;
+                    position->south = connect_to;
+                    connect_to->north = position;
+                    if(position->east != NULL){
+                        position = position->east;
+                        if(position->south != NULL){
+                            position = position->south;
+                            position->west = connect_to;
+                            connect_to->east = position;
+                        }
+                    }
+                }
+            }
+            position = starting_node;
+            if(position->south != NULL){
+                position = position->south;
+                if(position->east != NULL){
+                    position = position->east;
+                    position->north = connect_to;
+                    connect_to->south = position;
+                    if(position->east != NULL){
+                        position = position->east;
+                        if(position->north != NULL){
+                            position = position->north;
+                            position->west = connect_to;
+                            connect_to->east = position;
+                        }
+                    }
+                }
+            }
+            break;
+
+        case WEST:
+            if(position->north != NULL){
+                position = position->north;
+                if(position->west != NULL){
+                    position = position->west;
+                    position->south = connect_to;
+                    connect_to->north = position;
+                    if(position->west != NULL){
+                        position = position->west;
+                        if(position->south != NULL){
+                            position = position->south;
+                            position->east = connect_to;
+                            connect_to->west = position;
+                        }
+                    }
+                }
+            }
+            position = starting_node;
+            if(position->south != NULL){
+                position = position->south;
+                if(position->west != NULL){
+                    position = position->west;
+                    position->north = connect_to;
+                    connect_to->south = position;
+                    if(position->west != NULL){
+                        position = position->west;
+                        if(position->north != NULL){
+                            position = position->north;
+                            position->east = connect_to;
+                            connect_to->west = position;
+                        }
+                    }
+                }
+            }
+            break;
+    }
+
+}
+
+void update_tilemap(update_direction_t direction, world_node_t** world){
+
+    world_node_t* starting_node = *world;
+
+    switch(direction){
+        case NORTH:
+            if(starting_node->north == NULL){
+                starting_node->north = init_world_node();
+            }
+            starting_node->north->south = starting_node;
+            *world = starting_node->north;
+            connect_tilemap(NORTH,starting_node,starting_node->north);
+            
+
         break;
 
         case SOUTH:
@@ -118,6 +276,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
             }
             (*world)->south->north = *world;
             *world = (*world)->south;
+            connect_tilemap(SOUTH,starting_node,starting_node->south);
         break;
 
         case EAST:
@@ -126,6 +285,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
             }
             (*world)->east->west = *world;
             *world = (*world)->east;
+            connect_tilemap(EAST,starting_node,starting_node->east);
         break;
 
         case WEST:
@@ -134,6 +294,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
             }
             (*world)->west->east = *world;
             *world = (*world)->west;
+            connect_tilemap(WEST,starting_node,starting_node->west);
         break;
     }
 
