@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "player.h"
 
 
@@ -11,7 +10,7 @@ void render_tilemap(tilemap_t* map){
             j++;
         Color tile_color = TileColor(map->tiles[i]);
         DrawRectangle((i % map->x_dim)*map->tile_width,j*map->tile_height,map->tile_width,map->tile_height,tile_color);
-
+        DrawText(TextFormat("%d",map->id),50,50,50,MAROON);
     }
 
 }
@@ -103,7 +102,7 @@ void update(world_node_t** map, player_t* player,float delta,uint8_t* update_fla
 
 int main(int argc, char** argv){
 
-    world_node_t* map = init_world_node();
+    world_node_t* map = init_world_node(0);
     player_t* player = init_player(24/2, 32/2,32,32,400);
     float delta;
     uint8_t should_update = 0;

@@ -30,11 +30,13 @@ typedef struct tile{
 
 typedef struct tilemap{
    
+
     tile_t* tiles;
     uint16_t tile_width;
     uint16_t tile_height;
     uint16_t x_dim;
     uint16_t y_dim;
+    int id;
 
 }tilemap_t;
 
@@ -72,7 +74,7 @@ Vector2 tile_cords_from_pos(Vector2 pos, tilemap_t* map){
     return tile_pos;
 }
 
-tilemap_t* init_tilemap(uint16_t x_size, uint16_t y_size){
+tilemap_t* init_tilemap(uint16_t x_size, uint16_t y_size,int old_id){
     srand(time(NULL));
     tilemap_t* new_tilemap = calloc(1,sizeof(tilemap_t));
     tile_t* newmap = calloc(x_size*y_size, sizeof(tile_t));
@@ -85,18 +87,19 @@ tilemap_t* init_tilemap(uint16_t x_size, uint16_t y_size){
     new_tilemap->tile_width = TILE_WIDTH;
     new_tilemap->x_dim = x_size;
     new_tilemap->y_dim = y_size;
+    new_tilemap->id = old_id + 1;
     return new_tilemap;
 
 }
 
-world_node_t* init_world_node(){
+world_node_t* init_world_node(int old_tile_id){
     
     world_node_t* new_world = malloc(sizeof(world_node_t));
     new_world->north = NULL;
     new_world->east = NULL;
     new_world->west = NULL;
     new_world->south = NULL;
-    new_world->actual = init_tilemap(12,16);
+    new_world->actual = init_tilemap(12,16,old_tile_id);
     return new_world;
 
 }
@@ -445,7 +448,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
     switch(direction){
         case NORTH:
             if(starting_node->north == NULL){
-                starting_node->north = init_world_node();
+                starting_node->north = init_world_node((*world)->actual->id);
                 connect_tilemap(NORTH,starting_node,starting_node->north);
             }
             starting_node->north->south = starting_node;
@@ -457,7 +460,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
 
         case SOUTH:
             if((*world)->south == NULL){
-                (*world)->south = init_world_node();
+                (*world)->south = init_world_node((*world)->actual->id);
                 connect_tilemap(SOUTH,starting_node,starting_node->south);
             }
             (*world)->south->north = *world;
@@ -467,7 +470,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
 
         case EAST:
             if((*world)->east == NULL){
-                (*world)->east = init_world_node();
+                (*world)->east = init_world_node((*world)->actual->id);
                 connect_tilemap(EAST,starting_node,starting_node->east);
             }
             (*world)->east->west = *world;
@@ -477,7 +480,7 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
 
         case WEST:
             if((*world)->west == NULL){
-                (*world)->west = init_world_node();
+                (*world)->west = init_world_node((*world)->actual->id);
                 connect_tilemap(WEST,starting_node,starting_node->west);
             }
             (*world)->west->east = *world;
