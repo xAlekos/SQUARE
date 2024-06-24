@@ -1,5 +1,6 @@
 #include "../utils/utils.h"
 #include "../player/player.h"
+#include "../tilemap/tilemap.h"
 
 
 void render_tilemap(tilemap_t* map){
@@ -111,7 +112,7 @@ int main(int argc, char** argv){
         delta = GetFrameTime();
 
         DrawScreen(map,player,delta);
-        PlayerInput(player,map,delta);
+        PlayerInput(player,delta);
         update(&map,player,delta);
     }
 }

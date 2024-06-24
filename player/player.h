@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "../tilemap/tilemap.h"
+#include "../utils/utils.h"
 
 typedef enum player_states{
 
@@ -31,7 +31,7 @@ player_t* init_player(uint16_t starting_x , uint16_t starting_y, uint16_t starti
 
 void update_player_pos(player_t* player, float delta);
 
-void PlayerInput(player_t* player,world_node_t* map ,float delta);
+void PlayerInput(player_t* player ,float delta);
 
 Vector2 player_center_get(player_t* player);
 

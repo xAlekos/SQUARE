@@ -20,7 +20,7 @@ void update_player_pos(player_t* player, float delta){
 }
 
 
-void PlayerInput(player_t* player,world_node_t* map ,float delta){
+void PlayerInput(player_t* player,float delta){
 
     if(IsKeyDown(KEY_A)){
         player->vec_speed.x -= 1;
