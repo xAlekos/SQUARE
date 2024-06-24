@@ -1,10 +1,11 @@
-#include <raylib.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <time.h>
+#ifndef TILEMAP_H
+#define TILEMAP_H
 
 #define TILE_WIDTH 64
 #define TILE_HEIGHT 64
+
+#include "tilemap.h"
+#include "../utils/utils.h"
 
 typedef enum update_direction{
     NORTH,
@@ -75,13 +76,17 @@ Vector2 tile_cords_from_pos(Vector2 pos, tilemap_t* map){
 }
 
 tilemap_t* init_tilemap(uint16_t x_size, uint16_t y_size,int old_id){
+    
     srand(time(NULL));
     tilemap_t* new_tilemap = calloc(1,sizeof(tilemap_t));
     tile_t* newmap = calloc(x_size*y_size, sizeof(tile_t));
+
     for(int i = 0; i<rand() % 10; i++)
         newmap[rand() % x_size* y_size].type = ACID;
+
     for(int i = 0; i<rand() % 15; i++)
         newmap[rand() % (x_size* y_size)].type = WILL;
+        
     new_tilemap->tiles = newmap;
     new_tilemap->tile_height = TILE_HEIGHT;
     new_tilemap->tile_width = TILE_WIDTH;
@@ -104,193 +109,9 @@ world_node_t* init_world_node(int old_tile_id){
 
 }
 
-/*
-uint8_t update_position(update_direction_t direction, world_node_t** starting_position){
-    //TODO AGGIUNGERE CHECK SE PROVA AD ANDARE A NULL
-    switch (direction)
-    {
-    case NORTH: 
-        if((*starting_position)->north == NULL)
-            return 1;
-        *starting_position = (*starting_position)->north;
-        break;
-    case SOUTH:
-        if((*starting_position)->south == NULL)
-            return 1;
-        *starting_position = (*starting_position)->south;
-        break;
-    case WEST:
-        if((*starting_position)->west == NULL)
-            return 1;
-        *starting_position = (*starting_position)->west;
-        break;
-    case EAST:
-        if((*starting_position)->east == NULL)
-            return 1;
-        *starting_position = (*starting_position)->east;
-    default:
-        break;
-    }
-    return 0;
-}
-
-uint8_t connect_to_direction(update_direction_t direction, world_node_t* connect, world_node_t* to){
-    //TODO AGGIUNGERE CHECK SE PROVA AD ANDARE A NULL
-    switch (direction)
-    {
-    case NORTH: 
-        connect->north = to;
-        break;
-    case SOUTH:
-        connect->south = to;
-        break;
-    case WEST:
-        connect->west = to;
-        break;
-    case EAST:
-        connect->east = to;
-    default:
-        break;
-    }
-    return 0;
-}*/
-
-/*
-void connect_tilemap(update_direction_t direction, world_node_t* starting_node, world_node_t* connect_to){
-
-    update_direction_t move_order_a[4];
-    update_direction_t move_order_b[4];
-    update_direction_t connect_order_a[4];
-    update_direction_t  connect_order_b[4];
-    
-
-    switch (direction){
-        
-    case NORTH:
-
-        move_order_a[0] = EAST;
-        move_order_a[1] = NORTH;
-        move_order_a[2] = NORTH;
-        move_order_a[3] = WEST;
-
-        move_order_b[0] = WEST;
-        move_order_b[1] = NORTH;
-        move_order_b[2] = NORTH;
-        move_order_b[3] = EAST;
-
-        connect_order_a[0] = WEST;
-        connect_order_a[1] = EAST;
-        connect_order_a[2] = SOUTH;
-        connect_order_a[3] = NORTH;
-
-        connect_order_b[0] = EAST;
-        connect_order_b[1] = WEST;
-        connect_order_b[2] = SOUTH;
-        connect_order_b[3] = NORTH;
-
-        break;
-
-    case SOUTH:
-
-        move_order_a[0] = EAST;
-        move_order_a[1] = SOUTH;
-        move_order_a[2] = SOUTH;
-        move_order_a[3] = WEST;
-
-        move_order_b[0] = WEST;
-        move_order_b[1] = SOUTH;
-        move_order_b[2] = SOUTH;
-        move_order_b[3] = EAST;
-
-        connect_order_a[0] = WEST;
-        connect_order_a[1] = EAST;
-        connect_order_a[2] = NORTH;
-        connect_order_a[3] = SOUTH;
-
-        connect_order_b[0] = EAST;
-        connect_order_b[1] = WEST;
-        connect_order_b[2] = NORTH;
-        connect_order_b[3] = SOUTH;
-        break;
-
-    case WEST:
-
-        move_order_a[0] = NORTH;
-        move_order_a[1] = WEST;
-        move_order_a[2] = WEST;
-        move_order_a[3] = SOUTH;
-
-        move_order_b[0] = SOUTH;
-        move_order_b[1] = WEST;
-        move_order_b[2] = WEST;
-        move_order_b[3] = NORTH;
-
-        connect_order_a[0] = SOUTH;
-        connect_order_a[1] = NORTH;
-        connect_order_a[2] = EAST;
-        connect_order_a[3] = WEST;
-
-        connect_order_b[0] = NORTH;
-        connect_order_b[1] = SOUTH;
-        connect_order_b[2] = EAST;
-        connect_order_b[3] = WEST;
-        break;
-    case EAST:
-
-        move_order_a[0] = NORTH;
-        move_order_a[1] = EAST;
-        move_order_a[2] = EAST;
-        move_order_a[3] = SOUTH;
-
-        move_order_b[0] = SOUTH;
-        move_order_b[1] = EAST;
-        move_order_b[2] = EAST;
-        move_order_b[3] = NORTH;
-
-        connect_order_a[0] = SOUTH;
-        connect_order_a[1] = NORTH;
-        connect_order_a[2] = WEST;
-        connect_order_a[3] = EAST;
-
-        connect_order_b[0] = NORTH;
-        connect_order_b[1] = SOUTH;
-        connect_order_b[2] = WEST;
-        connect_order_b[3] = EAST;
-        break;
-    default:
-        break;
-    }
-
-    int j = 0;
-
-    for(int i = 0;i<4;i++){
-        
-        if(update_position(move_order_a[i],&starting_node) == 1)
-            break;
-        if(i == 1 || i == 3){
-        connect_to_direction(connect_order_a[j++],starting_node,connect_to);
-        connect_to_direction(connect_order_a[j++],connect_to,starting_node);
-        }            
-    }
-
-    j = 0;
-
-    for(int i = 0;i<4;i++){
-        
-        if(update_position(move_order_b[i],&starting_node) == 1)
-            break;
-        if(i == 1 || i == 3){
-        connect_to_direction(connect_order_b[j++],starting_node,connect_to);
-        connect_to_direction(connect_order_b[j++],connect_to,starting_node);  
-        }          
-    }
-
-    j = 0;
-}
-*/
 
 void connect_tilemap(update_direction_t direction, world_node_t* starting_node, world_node_t* connect_to){
-    //Questa funzione è un crimine contro l'umanità
+    //Questa funzione è un crimine contro l'umanità chiedo scusa
     world_node_t* position = starting_node;
 
     switch(direction){
@@ -491,3 +312,5 @@ void update_tilemap(update_direction_t direction, world_node_t** world){
 
 
 }
+
+#endif

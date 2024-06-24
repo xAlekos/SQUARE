@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <string.h>
-#include "player.h"
+#include "../utils/utils.h"
+#include "../player/player.h"
 
 
 void render_tilemap(tilemap_t* map){
@@ -66,9 +65,8 @@ void DrawScreen(world_node_t* map , player_t* player, float delta){
 
 }
 
-void update(world_node_t** map, player_t* player,float delta,uint8_t* update_flag){
+void update(world_node_t** map, player_t* player,float delta){
     
-    if(*update_flag == 1){
         update_player_pos(player,delta);
         
         if(player->pos.x < 0){
@@ -92,8 +90,7 @@ void update(world_node_t** map, player_t* player,float delta,uint8_t* update_fla
         }
 
         DrawScreen(*map,player,delta);
-        *update_flag = 0;
-    }
+
 
 }
 
@@ -105,7 +102,6 @@ int main(int argc, char** argv){
     world_node_t* map = init_world_node(0);
     player_t* player = init_player(24/2, 32/2,32,32,400);
     float delta;
-    uint8_t should_update = 0;
 
     InitWindow(map->actual->x_dim * TILE_WIDTH, map->actual->y_dim * TILE_HEIGHT,"SQUARE");
     SetTargetFPS(60);
@@ -115,8 +111,7 @@ int main(int argc, char** argv){
         delta = GetFrameTime();
 
         DrawScreen(map,player,delta);
-        PlayerInput(player,map,delta,&should_update);
-        if(should_update == 1)
-            update(&map,player,delta,&should_update);
+        PlayerInput(player,map,delta);
+        update(&map,player,delta);
     }
 }

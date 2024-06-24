@@ -1,31 +1,4 @@
-#include <stdint.h>
-#include <stdlib.h>
-#include <raylib.h>
-#include "tilemap.h"
-
-typedef enum player_states{
-
-    IDLE,
-    MOVING,
-    JUMPING,
-    SWIMMING
-
-} player_state_t;
-
-
-typedef struct player{
-   
-    float speed;
-    Vector2 vec_speed;
-
-    Vector2 pos;
-
-    Vector2 size;
-
-    player_state_t state;
-
-}player_t;
-
+#include "player.h"
 
 player_t* init_player(uint16_t starting_x , uint16_t starting_y, uint16_t starting_x_size, uint16_t starting_y_size, float player_speed){
     
@@ -47,26 +20,22 @@ void update_player_pos(player_t* player, float delta){
 }
 
 
-void PlayerInput(player_t* player,world_node_t* map ,float delta,uint8_t* update_flag){
+void PlayerInput(player_t* player,world_node_t* map ,float delta){
 
     if(IsKeyDown(KEY_A)){
         player->vec_speed.x -= 1;
-        *update_flag = 1;
     }
 
     if(IsKeyDown(KEY_D)){
         player->vec_speed.x += 1;
-        *update_flag = 1;
     }
 
     if(IsKeyDown(KEY_W)){
         player->vec_speed.y -= 1;
-        *update_flag = 1;
     }
 
     if(IsKeyDown(KEY_S)){
         player->vec_speed.y += 1;
-        *update_flag = 1;
     }   
 
 }
