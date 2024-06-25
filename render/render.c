@@ -1,7 +1,7 @@
 #include "../utils/utils.h"
 #include "../player/player.h"
 #include "../tilemap/tilemap.h"
-
+#include "../misc/dialog/dialog.h"
 
 void render_tilemap(tilemap_t* map){
     int j = 0;
@@ -21,13 +21,29 @@ void render_player(player_t* player){
 
 }
 
+
+
+void render_dialog_line(dialog_line_t* line){
+    
+    Rectangle dialog_box = {35, GetScreenHeight() - GetScreenHeight()/5, GetScreenWidth() - 70, GetScreenHeight()/5};
+
+    BeginDrawing();
+    DrawRectangleLinesEx(dialog_box,3,MAROON);
+    DrawText(TextFormat("%s",line->talker) , 35 + 5, (GetScreenHeight() - GetScreenHeight()/5), 20, WHITE );
+    DrawText(TextFormat("%s",line->text) , 35 + 5, (GetScreenHeight() - GetScreenHeight()/5) + 45 , 20, WHITE );
+    EndDrawing();
+
+}
+
+
+
 void highlight_tile(player_t* player, tilemap_t* map){
     Vector2 tile_pos;
     Vector2 player_center = player_center_get(player);
 
     tile_pos = tile_cords_from_pos(player_center,map);
     DrawRectangleLines(tile_pos.x * map->tile_width, tile_pos.y * map->tile_height, map->tile_width, map->tile_height, MAROON);
-
+    
 }
 
 
@@ -96,6 +112,22 @@ void update(world_node_t** map, player_t* player,float delta){
 }
 
 
+void dialog_event(world_node_t* map , player_t* player, float delta){
+
+    dialog_t* dial = malloc(sizeof(dialog_t));
+    read_dialog(dial,"./misc/dialog/cosmic_powers",0);
+    
+    while(dial->lines != NULL){
+
+        render_dialog_line(dial->lines);
+        if(IsKeyPressed(KEY_C)){
+            dial->lines = dial->lines->next;
+            DrawScreen(map,player,delta);
+        }
+        
+    }
+
+}
 
 
 int main(int argc, char** argv){
@@ -114,5 +146,10 @@ int main(int argc, char** argv){
         DrawScreen(map,player,delta);
         PlayerInput(player,delta);
         update(&map,player,delta);
+        if (IsKeyPressed(KEY_B))
+        {
+            dialog_event(map,player,delta);
+        }
+        
     }
 }
